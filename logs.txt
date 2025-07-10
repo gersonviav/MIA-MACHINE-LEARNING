@@ -1,0 +1,7 @@
+xxxxxxxxx
+              estacion categoria        lat         lon ico     cod cod_old    estado
+0          MONTEGRANDE        CO   -7.22499   -79.15323   M  100090  000396  DIFERIDO
+1           YONAN GORE       HLM   -7.25592   -79.09908   H  201204  201204  DIFERIDO
+2         QUEROCOTILLO       PLU   -6.27366   -79.03696   M  106067  153109  DIFERIDO
+3  PUENTE  MAYGASBAMBA       HLG   -6.67411   -78.52437   H  221110  220307  DIFERIDO
+4      QUEBRADA SHUGAR       PLU   -6.68778   -78.45694   M  100113  153108  DIFERIDO
