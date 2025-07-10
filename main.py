@@ -29,31 +29,6 @@ else:
     param2 = last_day_last_month.strftime('%Y-%m-%d')
 
 departamentes_distriluz(param1, param2)
-# Obtener la ruta actual antes de cambiar
-#directorio_anterior = os.getcwd()
-#readfile_piura(param1,param2)
-# #Volver al directorio anterior
-# os.chdir(directorio_anterior)
-
-# readfile_ancash(param1,param2)
-
-# os.chdir(directorio_anterior)
-# readfile_moquegua(param1,param2)
-# os.chdir(directorio_anterior)
-
-# #47E8568A_SANTA ANA ,
-# readfile_junin(param1,param2)
-# os.chdir(directorio_anterior)
-# #47290068_HUAC-HUAS
-# readfile_ayacucho(param1,param2)
-# os.chdir(directorio_anterior)
-# readfile_cajamarca(param1,param2)
-# os.chdir(directorio_anterior)
-# readfile_huancavelica(param1,param2)
-# #4728F216_CORDOVA,4729131E_SANTIAGO DE CHOCORVOS,4729131E_SANTIAGO DE CHOCORVOS
-# os.chdir(directorio_anterior)
-#readfile_huanuco()
-#readfile_lambayeque()
 
 
 
