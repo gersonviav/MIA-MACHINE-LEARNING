@@ -1,0 +1,11 @@
+# --- Bloquea cualquier hoja de cálculo Excel -------------------
+*.xls          # Excel 97-2003
+*.xlsx         # Excel 2007+
+*.xlsm         # Excel con macros
+*.xlsb         # Excel binario
+*.xlt*         # Plantillas Excel (xlt, xltx, xltm)
+*.xlw          # Workspace
+*.xlam         # Complementos
+
+# Si quieres ser más agresivo y capturar cualquier extensión que empiece por XL:
+# *.xl*
