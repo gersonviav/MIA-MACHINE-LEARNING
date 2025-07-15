@@ -4,6 +4,27 @@ from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
 import os
 import re
+def extraer_ubigeo_desde_html(link):
+    try:
+        response = requests.get(link, timeout=20)
+        soup = BeautifulSoup(response.text, 'html.parser')
+        texto = soup.get_text(separator=' ', strip=True)
+
+        # Regex robusto para detectar los campos
+        match = re.search(r"Departamento\s*:\s*([A-ZÁÉÍÓÚÑ ]+?)\s+Provincia\s*:\s*([A-ZÁÉÍÓÚÑ ]+?)\s+Distrito\s*:\s*([A-ZÁÉÍÓÚÑ ]+)",
+                          texto, flags=re.IGNORECASE)
+        
+        if match:
+            departamento = match.group(1).strip().title()
+            provincia = match.group(2).strip().title()
+            distrito = match.group(3).strip().title().replace("Latitud", "", 1).strip().title()
+            return {"departamento": departamento, "provincia": provincia, "distrito": distrito}
+        else:
+            return {"departamento": None, "provincia": None, "distrito": None}
+        
+    except Exception as e:
+        print(f"Error al extraer ubigeo desde {link}: {e}")
+        return {"departamento": None, "provincia": None, "distrito": None}
 def stations():
     link = "https://www.senamhi.gob.pe/mapas/mapa-estaciones-2/"
     response = requests.get(link)
@@ -146,6 +167,25 @@ def senamhiws_info(x, stations, from_date=None, to_date=None,departamento =None)
             except ValueError as e:
                     print(f"Error al leer HTML desde el enlace: {e}")
                     print(f"El enlace que falló es: {link}")
+            df_table = data_stn_senamhi[1]
+
+            # Validar contenido específico en la segunda fila
+            second_row = df_table.iloc[1].astype(str).str.strip().tolist()
+
+            # Define los valores obligatorios
+            valores_esperados = ["AÑO / MES / DÍA", "MAX", "MIN", "HUMEDAD RELATIVA (%)", "TOTAL"]
+
+            # Verifica si todos los esperados están presentes en la segunda fila
+            if not all(valor in second_row for valor in valores_esperados):
+                print(f"La segunda fila no contiene los valores esperados, se ignora: {link}")
+                continue
+
+            # Continúa procesamiento si pasa la validación
+            data_df_history_senamhi = df_table
+            data_df_history_senamhi.columns = data_df_history_senamhi.iloc[0]
+            data_df_history_senamhi = data_df_history_senamhi[1:].copy()
+
+
 
             data_df_history_senamhi = data_stn_senamhi[1]
             data_df_history_senamhi.columns = data_df_history_senamhi.iloc[0]
@@ -156,15 +196,29 @@ def senamhiws_info(x, stations, from_date=None, to_date=None,departamento =None)
             data_df_history_senamhi["lat"] = df_idx_stn['lat'].iloc[0]
             data_df_history_senamhi["lon"] = df_idx_stn['lon'].iloc[0]
             data_df_history_senamhi["ico"] = df_idx_stn['ico'].iloc[0]
+            
+            data_df_history_senamhi = data_df_history_senamhi[data_df_history_senamhi["ico"] == 'M']
 
-
-            data_df_history_senamhi  = data_df_history_senamhi.merge(df_depa, left_on='estacion', right_on='ESTACION', how='left')
+            ubigeo_info = extraer_ubigeo_desde_html(link)
+            data_df_history_senamhi["departamento"] = ubigeo_info["departamento"]
+            data_df_history_senamhi["provincia"] = ubigeo_info["provincia"]
+            data_df_history_senamhi["distrito"] = ubigeo_info["distrito"]
+            
+            #data_df_history_senamhi  = data_df_history_senamhi.merge(df_depa, left_on='estacion', right_on='ESTACION', how='left')
             #print("---¬\n" ,data_df_history_senamhi.head())
             # df_history_senamhi ["ico"] =ico
             #output_filename = f"{departamento}/{cod_stn[-1]}_{df_idx_stn['estacion'].iloc[0]}.xlsx"
             output_filename = f"{cod_stn[-1]}_{df_idx_stn['estacion'].iloc[0]}.xlsx"
-            data_df_history_senamhi.to_excel(output_filename, index=False)
-            break
+            
+
+            try:
+                    fila_3 = data_df_history_senamhi.iloc[3]
+                    print("Fila 3 (iloc):", fila_3)
+                    data_df_history_senamhi.to_excel(output_filename, index=False)
+            except IndexError:
+                     print("Fila 3 no encontrada con iloc")
+            
+            
     
     return df_history_senamhi
 def departamentes_distriluz(fec_ini,fec_fin):
